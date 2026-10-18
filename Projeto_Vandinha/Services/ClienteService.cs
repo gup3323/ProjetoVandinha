@@ -1,5 +1,4 @@
-﻿```csharp
-using Projeto_Vandinha.Models;
+﻿using Projeto_Vandinha.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -63,8 +62,7 @@ namespace Projeto_Vandinha.Services
             return Validator.TryValidateObject(
                 cliente,
                 context,
-                erros,
-                true
+                erros
             );
         }
 
