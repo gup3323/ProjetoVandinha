@@ -77,7 +77,8 @@ namespace Projeto_Vandinha.Services
             string cpf,
             string nomeCompleto,
             DateTime dataNascimento,
-            string email)
+            string email
+            )
         {
             var cliente = new Cliente
             {
@@ -96,6 +97,7 @@ namespace Projeto_Vandinha.Services
             if (Validar(cliente))
             {
                 Console.WriteLine("Dados do cliente inválidos.");
+                Console.WriteLine("teste");
                 return false;
             }
 
@@ -148,7 +150,7 @@ namespace Projeto_Vandinha.Services
         }
 
 
-        public bool CriarDivida(string cpf, decimal valor)
+        public bool CriarDivida(bool situacao1, string cpf, bool situacao, decimal valor)
         {
             var conexao = new NpgsqlConnection(connectionString);
             conexao.Open();

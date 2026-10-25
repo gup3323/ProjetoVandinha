@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Transactions;
 using Projeto_Vandinha.Models;
+using Projeto_Vandinha.Projeto_Vandinha.Services;
 using Projeto_Vandinha.Services;
 
 var service = new ClienteService();
@@ -16,9 +17,37 @@ var Email = Console.ReadLine();
 Console.WriteLine("Digite a data de nascimento: ");
 var DataNascimento = DateTime.Parse(Console.ReadLine());
 
+Console.WriteLine("Digite o valor da divida: ");
+var ValorDivida = int.Parse(Console.ReadLine());
+Console.WriteLine("Digite a data de Pagamento: ");
+var DataPagamento = DateTime.Parse(Console.ReadLine());
+
+var dividaTeste = new Divida
+{
+    Cpf = Cpf,
+    Valor = ValorDivida,
+    Situacao = false,
+    DataCriacao = DateTime.Now,
+    DataPagamento = DataPagamento
+};
+
+var divida = new DividaService();
+
+var criarDivida = divida.CriarDivida(
+    dividaTeste.Cpf = Cpf,
+    dividaTeste.Valor,
+    dividaTeste.Situacao,
+    dividaTeste.DataCriacao,
+    dividaTeste.DataPagamento.Value,
+    NomeCompleto = NomeCompleto,
+    DataNascimento = DataNascimento,
+    Email = Email
+);
+
+
 var clienteTeste = new Cliente
 {
-    Cpf = Cpf, 
+    Cpf = Cpf,
     NomeCompleto = NomeCompleto,
     DataNascimento = DataNascimento,
     Email = Email

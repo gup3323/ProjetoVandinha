@@ -17,7 +17,9 @@ namespace Projeto_Vandinha.Models
     public class Divida
     {
         [Required]
-        public decimal Valor { get; set; }
+        public string Cpf { get; set; }
+        [Required]
+        public int Valor { get; set; }
         [Required]
         public bool Situacao { get; set; }
         [Required]

@@ -1,4 +1,3 @@
 <Solution>
-  <Project Path="Projeto_Vandinha.Desktop/Projeto_Vandinha.Desktop.csproj" Id="7e350540-c486-4b92-9665-f6968c05f175" />
-  <Project Path="Projeto_Vandinha/Projeto_Vandinha.csproj" />
+  <Project Path="Projeto_Vandinha.csproj" />
 </Solution>
