@@ -15,7 +15,7 @@ Console.WriteLine("Digite o email: ");
 var Email = Console.ReadLine();
 Console.WriteLine("Digite a data de nascimento: ");
 var DataNascimento = DateTime.Parse(Console.ReadLine());
-
+Console.WriteLine(Cpf.GetType());
 var clienteTeste = new Cliente
 {
     Cpf = Cpf, 
@@ -24,13 +24,13 @@ var clienteTeste = new Cliente
     Email = Email
 };
 
-var clienteCriado = service.CriarCliente(Cpf, NomeCompleto, DataNascimento, Email);
+//var clienteCriado = service.CriarCliente(Cpf, NomeCompleto, DataNascimento, Email);
 
-if (clienteCriado)
-{
-    Console.WriteLine("Cliente criado com sucesso!");
-}
-else
-{
-    Console.WriteLine("Falha ao criar cliente.");
-}
+//if (clienteCriado)
+//{
+//    Console.WriteLine("Cliente criado com sucesso!");
+//}
+//else
+//{
+//    Console.WriteLine("Falha ao criar cliente.");
+//}
