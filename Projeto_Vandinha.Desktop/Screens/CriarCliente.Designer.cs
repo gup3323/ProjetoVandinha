@@ -133,11 +133,11 @@
             data_nascimento.CustomFormat = "";
             data_nascimento.Format = DateTimePickerFormat.Short;
             data_nascimento.Location = new Point(326, 216);
-            data_nascimento.MaxDate = new DateTime(2026, 10, 25, 0, 0, 0, 0);
+            data_nascimento.MaxDate = new DateTime(2099, 10, 25, 0, 0, 0, 0);
             data_nascimento.Name = "data_nascimento";
             data_nascimento.Size = new Size(150, 23);
             data_nascimento.TabIndex = 6;
-            data_nascimento.Value = new DateTime(2026, 10, 25, 0, 0, 0, 0);
+            data_nascimento.Value = new DateTime(2026, 10, 29, 0, 0, 0, 0);
             // 
             // nome_completo
             // 

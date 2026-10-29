@@ -66,7 +66,7 @@ namespace Projeto_Vandinha.Desktop.Screens
                     cpf.Clear();
                     nome_completo.Clear();
                     e_mail.Clear();
-                    data_nascimento.Value = DateTime.Now;
+                    data_nascimento.Value = DateTime.Today;
                     cpf.Focus();
                     this.Close();
                 }
