@@ -6,7 +6,6 @@ create table clientes(
 	primary key(CPF_cliente)
 );
 
-
 create table dividas(
 	id_divida serial not null,
 	cliente_CPF VARCHAR(11) not null,
@@ -14,7 +13,7 @@ create table dividas(
 	situacao_divida varchar(20),
 	data_registro timestamp default now(),
 	data_pagamento timestamp,
-	constraint fk_id_cliente foreign key(cliente_CPF) references clientes(CPF_cliente),
+	constraint fk_cliente_CPF foreign key(cliente_CPF) references clientes(CPF_cliente),
 	primary key(id_divida)
 );
 
