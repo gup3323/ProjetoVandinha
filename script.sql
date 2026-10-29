@@ -9,7 +9,7 @@ create table clientes(
 create table dividas(
 	id_divida serial not null,
 	cliente_CPF VARCHAR(11) not null,
-	valor_divida real,
+	valor_divida numeric(10, 2),
 	situacao_divida varchar(20),
 	data_registro timestamp default now(),
 	data_pagamento timestamp,
