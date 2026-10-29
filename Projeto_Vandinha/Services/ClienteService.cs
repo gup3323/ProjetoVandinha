@@ -1,6 +1,9 @@
 ﻿
+using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualBasic;
 using Npgsql;
 using NpgsqlTypes;
+using Projeto_Vandinha.Context;
 using Projeto_Vandinha.Models;
 using System;
 using System.Collections.Generic;
@@ -11,8 +14,15 @@ namespace Projeto_Vandinha.Services
 {
     public class ClienteService
     {
-        private string connectionString = "Host=localhost;Port=5432;Database=VendinhaPagamentos;Username=postgres;Password=051059;TrustServerCertificate=True;";
+        private const string connectionString = "Host=localhost;Port=5432;Database=postgres;Username=postgres;Password=051059;TrustServerCertificate=True;";
 
+        public ClienteService() : this(new VendinhaDbContext(connectionString)) {}
+        private VendinhaDbContext context;
+
+        public ClienteService(VendinhaDbContext context)
+        {
+            this.context = context;
+        }
 
         public bool ValidarCPF(string cpf)
         {
@@ -72,81 +82,85 @@ namespace Projeto_Vandinha.Services
                 true
             );
         }
+        private bool cpfValido = false;
 
-        public bool CriarCliente(
-            string cpf,
-            string nomeCompleto,
-            DateTime dataNascimento,
-            string email)
+        public async Task<int> CriarCliente(Cliente cliente)
         {
-            var cliente = new Cliente
-            {
-                Cpf = cpf,
-                NomeCompleto = nomeCompleto,
-                DataNascimento = dataNascimento,
-                Email = email
-            };
-
-            if (!ValidarCPF(cpf))
+            if (!ValidarCPF(cliente.Cpf))
             {
                 Console.WriteLine("CPF inválido.");
-                return false;
-            }
-
-            if (Validar(cliente))
-            {
-                Console.WriteLine("Dados do cliente inválidos.");
-                return false;
-            }
-
-            var conexao = new NpgsqlConnection(connectionString);
-            conexao.Open();
-            var sqlExisteCpf = """SELECT COUNT(*) FROM clientes WHERE cpf_cliente = @Cpf""";
-            var comandoExisteCpf = new NpgsqlCommand(sqlExisteCpf, conexao);
-            comandoExisteCpf.Parameters.Add("Cpf", NpgsqlDbType.Text).Value = cliente.Cpf;
-            var resultadoExisteCpf = (long)comandoExisteCpf.ExecuteScalar();
-
-            if (resultadoExisteCpf > 0)
-            {
-                Console.WriteLine("Cliente com este CPF já existe.");
-                return false;
+                return 1;
             }
             else
             {
-                var sqlInsert = """INSERT INTO clientes (cpf_cliente, nome_cliente, email_cliente, data_nascimento_cliente) VALUES (@Cpf, @NomeCompleto, @Email, @DataNascimento)""";
-                var comando = new NpgsqlCommand(sqlInsert, conexao);
-                comando.Parameters.Add("Cpf", NpgsqlDbType.Text).Value = cliente.Cpf;
-                comando.Parameters.Add("NomeCompleto", NpgsqlDbType.Text).Value = cliente.NomeCompleto;
-                comando.Parameters.Add("Email", NpgsqlDbType.Text).Value = cliente.Email;
-                comando.Parameters.Add("DataNascimento", NpgsqlDbType.Date).Value = cliente.DataNascimento;
-                comando.ExecuteNonQuery();
-                return true;
-            }
-            
-        }
-
-        public List<Cliente> ListarClientes()
-        {
-            var conexao = new NpgsqlConnection(connectionString);
-            conexao.Open();
-            var sql = """SELECT * FROM Clientes""";
-            var comando = new NpgsqlCommand(sql, conexao);
-            var leitor = comando.ExecuteReader();
-            var resultado = new List<Cliente>();
-            while (leitor.Read())
-            {
-                var aluno = new Cliente
+                cpfValido = true;
+                if (!Validar(cliente))
                 {
-                    Cpf = leitor.GetString(0),
-                    NomeCompleto = leitor.GetString(1),
-                    Email = leitor.GetString(2),
-                    DataNascimento = leitor.GetDateTime(3)
-                };
-                resultado.Add(aluno);
+                    Console.WriteLine("Algo deu errado.");
+                    return 2;
+                }
+                else
+                {
+                    var cpfBanco = await context.Clientes.AsNoTracking().FirstOrDefaultAsync(c => c.Cpf == cliente.Cpf);
+                    if (cpfBanco != null)
+                    {
+                        Console.WriteLine("Cliente com este CPF já existe.");
+                        return 3;
+                    }
+                    else
+                    {
+                        context.Clientes.Add(cliente);
+                        await context.SaveChangesAsync();
+                        return 0;
+                    }
+                }
             }
-            return resultado;
         }
 
+        public async Task<List<Cliente>> ListarClientes(int paginaAtual)
+        {
+
+            if (paginaAtual < 1) paginaAtual = 1;
+            return await context.Clientes.OrderBy(c => c.NomeCompleto).Skip((paginaAtual - 1) * 10).Take(10).AsNoTracking().ToListAsync();
+        }
+
+        public async Task<List<Cliente>> BuscarClientes(string pesquisa)
+        {
+            var resultados = context.Clientes.Where(c => c.Cpf.Contains(pesquisa) ||
+            c.NomeCompleto.Contains(pesquisa) ||
+            c.Email.Contains(pesquisa)).OrderBy(c => c.NomeCompleto);
+            return resultados.ToList();
+        }
+        public async Task<Cliente?> BuscarClientePorCpf(string cpf)
+        {
+            var cliente = await context.Clientes.FirstOrDefaultAsync(c => c.Cpf == cpf);
+            return cliente;
+        }
+        public async Task<bool> AtualizarCliente(string cpf, Cliente clienteAtualizado)
+        {
+            var clienteExistente = await BuscarClientePorCpf(cpf);
+            if (clienteExistente == null)
+            {
+                return false;
+            }
+            clienteExistente.NomeCompleto = clienteAtualizado.NomeCompleto;
+            clienteExistente.DataNascimento = DateTime.SpecifyKind(clienteAtualizado.DataNascimento, DateTimeKind.Utc);
+            clienteExistente.Email = clienteAtualizado.Email;
+            await context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> DeletarCliente(string cpf)
+        {
+            var clienteExistente = await BuscarClientePorCpf(cpf);
+            if (clienteExistente == null)
+            {
+                return false;
+            }
+            context.Clientes.Remove(clienteExistente);
+            await context.SaveChangesAsync();
+            return true;
+        }
 
         public bool CriarDivida(string cpf, decimal valor)
         {
