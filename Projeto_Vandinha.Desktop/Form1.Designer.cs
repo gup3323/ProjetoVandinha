@@ -32,9 +32,9 @@
             tableLayoutPanel1 = new TableLayoutPanel();
             label3 = new Label();
             label2 = new Label();
-            botaoBuscar2 = new Projeto_Vandinha.Desktop.Components.BotaoBuscar();
-            botaoSalvar1 = new Projeto_Vandinha.Desktop.Components.BotaoSalvar();
             botaoSalvar2 = new Projeto_Vandinha.Desktop.Components.BotaoSalvar();
+            botaoSalvar1 = new Projeto_Vandinha.Desktop.Components.BotaoSalvar();
+            botaoBuscar2 = new Projeto_Vandinha.Desktop.Components.BotaoBuscar();
             label1 = new Label();
             botaoBuscar1 = new Projeto_Vandinha.Desktop.Components.BotaoBuscar();
             tableLayoutPanel1.SuspendLayout();
@@ -109,22 +109,23 @@
             label2.Text = "Clientes";
             label2.TextAlign = ContentAlignment.BottomCenter;
             // 
-            // botaoBuscar2
+            // botaoSalvar2
             // 
-            botaoBuscar2.Anchor = AnchorStyles.Top;
-            botaoBuscar2.BackColor = Color.FromArgb(0, 123, 255);
-            botaoBuscar2.Cursor = Cursors.Hand;
-            botaoBuscar2.FlatAppearance.BorderSize = 0;
-            botaoBuscar2.FlatStyle = FlatStyle.Flat;
-            botaoBuscar2.Font = new Font("Segoe UI", 9.75F, FontStyle.Bold);
-            botaoBuscar2.ForeColor = Color.White;
-            botaoBuscar2.Location = new Point(878, 139);
-            botaoBuscar2.Margin = new Padding(5);
-            botaoBuscar2.Name = "botaoBuscar2";
-            botaoBuscar2.Size = new Size(166, 38);
-            botaoBuscar2.TabIndex = 5;
-            botaoBuscar2.Text = "Exibir Dividas";
-            botaoBuscar2.UseVisualStyleBackColor = false;
+            botaoSalvar2.Anchor = AnchorStyles.Top;
+            botaoSalvar2.BackColor = Color.FromArgb(40, 167, 69);
+            botaoSalvar2.Cursor = Cursors.Hand;
+            botaoSalvar2.FlatAppearance.BorderSize = 0;
+            botaoSalvar2.FlatStyle = FlatStyle.Flat;
+            botaoSalvar2.Font = new Font("Segoe UI", 9.75F, FontStyle.Bold);
+            botaoSalvar2.ForeColor = Color.White;
+            botaoSalvar2.Location = new Point(878, 273);
+            botaoSalvar2.Margin = new Padding(5);
+            botaoSalvar2.Name = "botaoSalvar2";
+            botaoSalvar2.Size = new Size(166, 38);
+            botaoSalvar2.TabIndex = 11;
+            botaoSalvar2.Text = "Criar Divida";
+            botaoSalvar2.UseVisualStyleBackColor = false;
+            botaoSalvar2.Click += botaoSalvar2_Click_1;
             // 
             // botaoSalvar1
             // 
@@ -144,22 +145,23 @@
             botaoSalvar1.UseVisualStyleBackColor = false;
             botaoSalvar1.Click += botaoSalvar1_Click;
             // 
-            // botaoSalvar2
+            // botaoBuscar2
             // 
-            botaoSalvar2.Anchor = AnchorStyles.Top;
-            botaoSalvar2.BackColor = Color.FromArgb(40, 167, 69);
-            botaoSalvar2.Cursor = Cursors.Hand;
-            botaoSalvar2.FlatAppearance.BorderSize = 0;
-            botaoSalvar2.FlatStyle = FlatStyle.Flat;
-            botaoSalvar2.Font = new Font("Segoe UI", 9.75F, FontStyle.Bold);
-            botaoSalvar2.ForeColor = Color.White;
-            botaoSalvar2.Location = new Point(878, 273);
-            botaoSalvar2.Margin = new Padding(5);
-            botaoSalvar2.Name = "botaoSalvar2";
-            botaoSalvar2.Size = new Size(166, 38);
-            botaoSalvar2.TabIndex = 11;
-            botaoSalvar2.Text = "Criar Divida";
-            botaoSalvar2.UseVisualStyleBackColor = false;
+            botaoBuscar2.Anchor = AnchorStyles.Top;
+            botaoBuscar2.BackColor = Color.FromArgb(0, 123, 255);
+            botaoBuscar2.Cursor = Cursors.Hand;
+            botaoBuscar2.FlatAppearance.BorderSize = 0;
+            botaoBuscar2.FlatStyle = FlatStyle.Flat;
+            botaoBuscar2.Font = new Font("Segoe UI", 9.75F, FontStyle.Bold);
+            botaoBuscar2.ForeColor = Color.White;
+            botaoBuscar2.Location = new Point(878, 139);
+            botaoBuscar2.Margin = new Padding(5);
+            botaoBuscar2.Name = "botaoBuscar2";
+            botaoBuscar2.Size = new Size(166, 38);
+            botaoBuscar2.TabIndex = 5;
+            botaoBuscar2.Text = "Exibir Dividas";
+            botaoBuscar2.UseVisualStyleBackColor = false;
+            botaoBuscar2.Click += botaoBuscar2_Click;
             // 
             // label1
             // 

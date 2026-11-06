@@ -15,6 +15,8 @@ namespace Projeto_Vandinha.Context
             this.connectionString = connectionString;
         }
         public DbSet<Cliente> Clientes => Set<Cliente>();
+        public DbSet<Divida> Dividas => Set<Divida>();
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             var clienteEntity = modelBuilder.Entity<Cliente>();
@@ -24,6 +26,15 @@ namespace Projeto_Vandinha.Context
             clienteEntity.Property(c => c.NomeCompleto).HasColumnName("nome_cliente");
             clienteEntity.Property(c => c.Email).HasColumnName("email_cliente");
             clienteEntity.Property(c => c.DataNascimento).HasColumnName("data_nascimento_cliente");
+
+            var dividaEntity = modelBuilder.Entity<Divida>();
+            dividaEntity.ToTable("dividas");
+            dividaEntity.HasKey(d => d.id_divida);
+            dividaEntity.Property(d => d.CpfCliente).HasColumnName("cliente_id");
+            dividaEntity.Property(d => d.Valor).HasColumnName("valor_divida");
+            dividaEntity.Property(d => d.Situacao).HasColumnName("situacao_divida");
+            dividaEntity.Property(d => d.DataCriacao).HasColumnName("data_registro");
+            dividaEntity.Property(d => d.DataPagamento).HasColumnName("data_pagamento");
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

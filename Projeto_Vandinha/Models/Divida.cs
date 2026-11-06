@@ -17,12 +17,16 @@ namespace Projeto_Vandinha.Models
     public class Divida
     {
         [Required]
-        public decimal Valor { get; set; }
+        public int id_divida { get; set; }
         [Required]
-        public bool Situacao { get; set; }
+        public string CpfCliente { get; set; }
+        [Required]
+        public int Valor { get; set; }
+        [Required]
+        public string Situacao { get; set; }
         [Required]
         public DateTime DataCriacao { get; set; }
-        public DateTime? DataPagamento { get; set; }
+        public DateTime DataPagamento { get; set; }
 
 
     }
