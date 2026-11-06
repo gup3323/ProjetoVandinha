@@ -26,12 +26,12 @@ namespace Projeto_Vandinha.Services
 
         public bool ValidarCPF(string cpf)
         {
-            cpf = cpf.Replace(".", "").Replace("-", "");
+            cpf = NormalizarCpf(cpf);
 
             if (cpf.Length != 11)
                 return false;
 
-            if (!long.TryParse(cpf, out _))
+            if (!cpf.All(char.IsAsciiDigit))
                 return false;
 
             int[] numeros = new int[11];
@@ -70,6 +70,11 @@ namespace Projeto_Vandinha.Services
             return true;
         }
 
+        private static string NormalizarCpf(string? cpf)
+        {
+            return cpf?.Trim().Replace(".", "").Replace("-", "") ?? string.Empty;
+        }
+
         public bool Validar(Cliente cliente)
         {
             var context = new ValidationContext(cliente);
@@ -86,6 +91,8 @@ namespace Projeto_Vandinha.Services
 
         public async Task<int> CriarCliente(Cliente cliente)
         {
+            cliente.Cpf = NormalizarCpf(cliente.Cpf);
+
             if (!ValidarCPF(cliente.Cpf))
             {
                 Console.WriteLine("CPF inválido.");

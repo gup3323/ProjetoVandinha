@@ -13,7 +13,7 @@ namespace Projeto_Vandinha.Models
         public string Cpf { get; set; }
         [Required]
         [StringLength(80, MinimumLength = 6)]
-        [RegularExpression("^[a-zA-Z\\s]+$")]
+        [RegularExpression(@"^[\p{L}\s]+$")]
         public string NomeCompleto { get; set; }
         public DateTime DataNascimento { get; set; }
         [Range(15, 100)]
