@@ -101,7 +101,7 @@
             botaoEditar1.Name = "botaoEditar1";
             botaoEditar1.Size = new Size(196, 38);
             botaoEditar1.TabIndex = 15;
-            botaoEditar1.Text = "Editar Cliente";
+            botaoEditar1.Text = "Editar Divida";
             botaoEditar1.UseVisualStyleBackColor = false;
             botaoEditar1.Click += botaoEditar1_Click;
             // 

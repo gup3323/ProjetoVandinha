@@ -8,7 +8,6 @@ using Projeto_Vandinha.Context;
 using Projeto_Vandinha.Models;
 using Microsoft.EntityFrameworkCore;
 
-
 namespace Projeto_Vandinha.Services
 {
     public class DividaService
@@ -24,19 +23,21 @@ namespace Projeto_Vandinha.Services
             this.context = context;
         }
 
-        public int CriarDivida(string cpf, int valor, DateTime dataPagamento)
+        public int CriarDivida(string cpf, decimal valor, DateTime dataPagamento)
         {
+            var retorno = 0;
+            var validacpf = new ClienteService();
+            if (validacpf.ValidarCPF(cpf))
+            {
+                retorno = 1;
+                return retorno;
+            }
             var conexao = new NpgsqlConnection(connectionString);
             conexao.Open();
             var sqlExisteCpf = """SELECT COUNT(*) FROM clientes WHERE CPF_cliente = @Cpf""";
             var comandoExisteCpf = new NpgsqlCommand(sqlExisteCpf, conexao);
             comandoExisteCpf.Parameters.Add("Cpf", NpgsqlDbType.Varchar).Value = cpf;
-            var resultadoExisteCpf = (long)comandoExisteCpf.ExecuteScalar();
-            if (resultadoExisteCpf == 0)
-            {
-                Console.WriteLine("Cliente com este CPF não existe.");
-                return 1;
-            }
+
             var sqlDividaAberta = """SELECT COUNT(*) FROM dividas WHERE cliente_id = @Cpf AND situacao_divida = 'PENDENTE'""";
             var comandoDividaAberta = new NpgsqlCommand(sqlDividaAberta, conexao);
             comandoDividaAberta.Parameters.Add("Cpf", NpgsqlDbType.Varchar).Value = cpf;
@@ -44,7 +45,7 @@ namespace Projeto_Vandinha.Services
             if (resultadoDividaAberta > 0)
             {
                 Console.WriteLine("Cliente já possui uma dívida em aberto.");
-                return 2;
+                retorno = 2;
             }
             else
             {
@@ -52,7 +53,7 @@ namespace Projeto_Vandinha.Services
                 {
 
                     CpfCliente = cpf,
-                    Valor = (int)valor,
+                    Valor = (decimal)valor,
                     Situacao = "PENDENTE".ToUpper(),
                     DataCriacao = DateTime.Now,
                     DataPagamento = dataPagamento
@@ -61,13 +62,14 @@ namespace Projeto_Vandinha.Services
                 var sqlInsertDivida = """INSERT INTO dividas (cliente_id, valor_divida, situacao_divida, data_registro, data_pagamento) VALUES (@Cpf, @Valor, 'PENDENTE', @DataCriacao, @DataPagamento)""";
                 var comandoInsertDivida = new NpgsqlCommand(sqlInsertDivida, conexao);
                 //comandoInsertDivida.Parameters.Add("id", NpgsqlDbType.Integer).Value = 0;
-                comandoInsertDivida.Parameters.Add("Cpf", NpgsqlDbType.Varchar).Value = divida.CpfCliente;
+                comandoInsertDivida.Parameters.Add("Cpf", NpgsqlDbType.Text).Value = divida.CpfCliente;
                 comandoInsertDivida.Parameters.Add("Valor", NpgsqlDbType.Numeric).Value = divida.Valor;
                 comandoInsertDivida.Parameters.Add("DataCriacao", NpgsqlDbType.Date).Value = divida.DataCriacao;
                 comandoInsertDivida.Parameters.Add("DataPagamento", NpgsqlDbType.Date).Value = divida.DataPagamento;
                 comandoInsertDivida.ExecuteNonQuery();
-                return 3;
+                retorno = 3;
             }
+            return retorno;
         }
         public async Task<List<Divida>> ListarDivida(int paginaAtual)
         {
