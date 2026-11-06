@@ -21,7 +21,7 @@ namespace Projeto_Vandinha.Models
         [Required]
         public string CpfCliente { get; set; }
         [Required]
-        public int Valor { get; set; }
+        public decimal Valor { get; set; }
         [Required]
         public string Situacao { get; set; }
         [Required]

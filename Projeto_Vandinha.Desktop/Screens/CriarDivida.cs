@@ -24,8 +24,8 @@ namespace Projeto_Vandinha.Desktop.Screens
         private void cpf_TextChanged(object sender, EventArgs e)
         {
         }
-        private void tableLayoutPanel1_Paint(object sender, PaintEventArgs e) 
-        { 
+        private void tableLayoutPanel1_Paint(object sender, PaintEventArgs e)
+        {
         }
         private void lblMensagemStatus_Click(object sender, EventArgs e)
         {
@@ -33,7 +33,7 @@ namespace Projeto_Vandinha.Desktop.Screens
 
 
         private readonly DividaService service;
-        public CriarDivida( DividaService service)
+        public CriarDivida(DividaService service)
         {
             this.service = service;
             InitializeComponent();
@@ -46,7 +46,7 @@ namespace Projeto_Vandinha.Desktop.Screens
             {
                 //id_divida = 0,
                 CpfCliente = cpf.Text,
-                Valor = (int)numericUpDown1.Value,
+                Valor = (decimal)numericUpDown1.Value,
                 Situacao = "pendente".ToUpper(),
                 DataCriacao = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Utc),
                 DataPagamento = DateTime.SpecifyKind(data_pagamento.Value, DateTimeKind.Utc)
@@ -56,21 +56,18 @@ namespace Projeto_Vandinha.Desktop.Screens
                 int resultado = service.CriarDivida(divida.CpfCliente, divida.Valor, divida.DataPagamento);
                 if (resultado == 1)
                 {
-                    lblMensagemStatus = new Label();
                     lblMensagemStatus.ForeColor = Color.Red;
                     lblMensagemStatus.Visible = true;
                     lblMensagemStatus.Text = "CPF inválido.";
                 }
-                else if (resultado == 2)
+                if (resultado == 2)
                 {
-                    lblMensagemStatus = new Label();
                     lblMensagemStatus.ForeColor = Color.Red;
                     lblMensagemStatus.Visible = true;
                     lblMensagemStatus.Text = "Cliente já possui uma dívida em aberto.";
                 }
                 else
                 {
-                    //MessageBox.Show("Dívida criada com sucesso!");
                     lblMensagemStatus.ForeColor = Color.DarkGreen;
                     lblMensagemStatus.Text = "Dívida cadastrada com sucesso!";
                     lblMensagemStatus.Visible = true;
@@ -93,6 +90,21 @@ namespace Projeto_Vandinha.Desktop.Screens
                 criarBtn.Enabled = true;
             }
 
+        }
+
+        private void numericUpDown1_ValueChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void CriarDivida_Load(object sender, EventArgs e)
+        {
+            numericUpDown1.Minimum = 0m;
+            numericUpDown1.Maximum = 1000000m;
+            numericUpDown1.DecimalPlaces = 2;
+            numericUpDown1.Increment = 0.01m;
+            numericUpDown1.ThousandsSeparator = true;
+            numericUpDown1.Value = 0m;
         }
     }
 }
