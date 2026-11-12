@@ -131,11 +131,11 @@
             // 
             // situacaoEditar
             // 
-            situacaoEditar.Location = new Point(3, 212);
+            situacaoEditar.Anchor = AnchorStyles.Top;
+            situacaoEditar.Location = new Point(332, 212);
             situacaoEditar.Name = "situacaoEditar";
-            situacaoEditar.Size = new Size(100, 23);
+            situacaoEditar.Size = new Size(138, 23);
             situacaoEditar.TabIndex = 12;
-            situacaoEditar.Visible = false;
             // 
             // EditarDivida
             // 

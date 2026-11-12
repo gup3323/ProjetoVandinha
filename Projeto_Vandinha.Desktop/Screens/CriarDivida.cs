@@ -28,7 +28,7 @@ namespace Projeto_Vandinha.Desktop.Screens
 
             try
             {
-                int resultado = await service.CriarDivida(cpf.Text, numericUpDown1.Value, null);
+                int resultado = await service.CriarDivida(cpf.Text, numericUpDown1.Value, data_pagamento.Value.Date);
 
                 if (resultado == 1)
                 {
@@ -80,6 +80,7 @@ namespace Projeto_Vandinha.Desktop.Screens
             numericUpDown1.Increment = 0.01m;
             numericUpDown1.ThousandsSeparator = true;
             numericUpDown1.Value = 0m;
+            data_pagamento.Value = DateTime.Today;
         }
     }
 }

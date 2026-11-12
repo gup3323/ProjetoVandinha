@@ -101,19 +101,11 @@ namespace Projeto_Vandinha.Services
             if (divida == null)
                 return false;
 
-            string novaSituacao = dividaAtualizada.Situacao?.Trim().ToUpperInvariant() ?? "PENDENTE";
-            divida.Situacao = novaSituacao;
-
-            if (novaSituacao == "PAGO")
-            {
-                divida.DataPagamento = dividaAtualizada.DataPagamento ?? DateTime.Now;
-            }
-            else
-            {
-                divida.DataPagamento = null;
-            }
+            divida.Situacao = "PAGO";
+            divida.DataPagamento = dividaAtualizada.DataPagamento ?? DateTime.Today;
 
             await context.SaveChangesAsync();
+            context.Entry(divida).State = EntityState.Detached;
             return true;
         }
     }
