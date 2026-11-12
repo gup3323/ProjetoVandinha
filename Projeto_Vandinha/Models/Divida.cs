@@ -1,33 +1,29 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Runtime.ConstrainedExecution;
-using System.Text;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Projeto_Vandinha.Models
 {
-
-    //Valor
-    //Situação: paga ou não
-    //Data de criação
-    //Data de pagamento
-    //Regra: um cliente só pode ter uma dívida em aberto
-
     public class Divida
     {
-        [Required]
+        [Key]
         public int id_divida { get; set; }
+
         [Required]
-        public string CpfCliente { get; set; }
+        public string CpfCliente { get; set; } = string.Empty;
+
         [Required]
         public decimal Valor { get; set; }
+
         [Required]
-        public string Situacao { get; set; }
+        public string Situacao { get; set; } = "PENDENTE";
+
         [Required]
         public DateTime DataCriacao { get; set; }
-        public DateTime DataPagamento { get; set; }
 
+        public DateTime? DataPagamento { get; set; }
 
+        [ForeignKey(nameof(CpfCliente))]
+        public Cliente? Cliente { get; set; }
     }
 }

@@ -1,29 +1,42 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Projeto_Vandinha.Models;
+﻿using Projeto_Vandinha.Models;
 using Projeto_Vandinha.Services;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace Projeto_Vandinha.Desktop.Screens
 {
     public partial class ExibirClientes : Form
     {
         private readonly ClienteService service;
+
         public ExibirClientes(ClienteService service)
         {
             InitializeComponent();
             this.service = service;
             Load += ExibirClientes_Load;
         }
+
         private async void ExibirClientes_Load(object? sender, EventArgs e)
         {
+            // Garante que exista a coluna de Total de Dívidas caso não tenha sido criada no Designer
+            if (dataGridView1.Columns.Count == 5)
+            {
+                dataGridView1.Columns.Add("colTotalDividas", "Total Dívidas (R$)");
+            }
+
+            pgAtual.Text = "1";
             await CarregarDados();
         }
 
         private async Task CarregarDados()
         {
-            int paginaAtual = 1;
+            int paginaAtual = int.TryParse(pgAtual.Text, out int pg) && pg > 0 ? pg : 1;
             var clientes = await service.ListarClientes(paginaAtual);
             CarregarTabela(clientes);
         }
+
         private void CarregarTabela(List<Cliente> clientes)
         {
             dataGridView1.Rows.Clear();
@@ -33,23 +46,39 @@ namespace Projeto_Vandinha.Desktop.Screens
                 dataGridView1.Rows.Add(
                     cliente.Cpf,
                     cliente.NomeCompleto,
-                    cliente.Email,
-                    cliente.DataNascimento,
-                    cliente.Idade
+                    cliente.Email ?? "-",
+                    cliente.DataNascimento.ToString("dd/MM/yyyy"),
+                    cliente.Idade,
+                    cliente.TotalDividasEmAberto.ToString("C2")
                 );
             }
         }
+
+        private string ObterCpfAlvo()
+        {
+            if (!string.IsNullOrWhiteSpace(txtBusca.Text))
+                return txtBusca.Text.Trim();
+
+            if (dataGridView1.CurrentRow != null && dataGridView1.CurrentRow.Cells[0].Value != null)
+                return dataGridView1.CurrentRow.Cells[0].Value.ToString() ?? string.Empty;
+
+            return string.Empty;
+        }
+
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
-
+            if (e.RowIndex >= 0 && dataGridView1.Rows[e.RowIndex].Cells[0].Value != null)
+            {
+                txtBusca.Text = dataGridView1.Rows[e.RowIndex].Cells[0].Value.ToString();
+            }
         }
 
         private async void botaoBuscar1_Click(object sender, EventArgs e)
         {
-            var cliente = await service.BuscarClientePorCpf(txtBusca.Text);
-            if (txtBusca.Text == "")
+            if (string.IsNullOrWhiteSpace(txtBusca.Text))
             {
-                CarregarDados();
+                pgAtual.Text = "1";
+                await CarregarDados();
             }
             else
             {
@@ -77,7 +106,6 @@ namespace Projeto_Vandinha.Desktop.Screens
             int paginaAtual = int.Parse(pgAtual.Text);
             if (paginaAtual > 1)
             {
-                ant.Visible = true;
                 paginaAtual--;
                 var clientes = await service.ListarClientes(paginaAtual);
                 CarregarTabela(clientes);
@@ -85,36 +113,49 @@ namespace Projeto_Vandinha.Desktop.Screens
             }
         }
 
-        private void botaoExcluir1_Click(object sender, EventArgs e)
+        private async void botaoExcluir1_Click(object sender, EventArgs e)
         {
-            var clienteExcluir = service.BuscarClientePorCpf(txtBusca.Text);
+            string cpfAlvo = ObterCpfAlvo();
+            var clienteExcluir = await service.BuscarClientePorCpf(cpfAlvo);
+
             if (clienteExcluir != null)
             {
-                var confirmResult = MessageBox.Show($"Tem certeza que deseja excluir cliente de CPF {txtBusca.Text}?", "Confirmação de exclusão", MessageBoxButtons.YesNo);
+                var confirmResult = MessageBox.Show(
+                    $"Tem certeza que deseja excluir o cliente {clienteExcluir.NomeCompleto} (CPF {clienteExcluir.Cpf})?",
+                    "Confirmação de exclusão",
+                    MessageBoxButtons.YesNo);
+
                 if (confirmResult == DialogResult.Yes)
                 {
-                    service.DeletarCliente(txtBusca.Text);
-                    MessageBox.Show("Cliente excluído com sucesso!");
-                    txtBusca.Clear();
-                    dataGridView1.Rows.Clear();
-                    CarregarDados();
+                    bool deletado = await service.DeletarCliente(clienteExcluir.Cpf);
+                    if (deletado)
+                    {
+                        MessageBox.Show("Cliente excluído com sucesso!");
+                        txtBusca.Clear();
+                        await CarregarDados();
+                    }
                 }
             }
             else
             {
-                MessageBox.Show("Cliente não encontrado.");
+                MessageBox.Show("Selecione um cliente na tabela ou digite o CPF para excluir.");
             }
         }
 
         private async void botaoEditar1_Click(object sender, EventArgs e)
         {
-            
-            var clienteSelecionado = await service.BuscarClientePorCpf(txtBusca.Text);
+            string cpfAlvo = ObterCpfAlvo();
+            var clienteSelecionado = await service.BuscarClientePorCpf(cpfAlvo);
+
             if (clienteSelecionado != null)
             {
                 var telaEdicao = new EditarCliente(clienteSelecionado.Cpf);
                 telaEdicao.ShowDialog(this);
-                CarregarDados();
+                await CarregarDados();
+            }
+            else
+            {
+                MessageBox.Show("Selecione um cliente na tabela ou digite o CPF para editar.");
             }
         }
     }
