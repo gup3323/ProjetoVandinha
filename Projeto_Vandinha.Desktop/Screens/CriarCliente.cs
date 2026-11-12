@@ -1,11 +1,7 @@
 ﻿using Projeto_Vandinha.Models;
 using Projeto_Vandinha.Services;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 
 namespace Projeto_Vandinha.Desktop.Screens
@@ -13,6 +9,7 @@ namespace Projeto_Vandinha.Desktop.Screens
     public partial class CriarCliente : Form
     {
         private readonly ClienteService service;
+
         public CriarCliente(ClienteService service)
         {
             this.service = service;
@@ -29,7 +26,7 @@ namespace Projeto_Vandinha.Desktop.Screens
                 Cpf = cpf.Text,
                 NomeCompleto = nome_completo.Text,
                 Email = e_mail.Text,
-                DataNascimento = DateTime.SpecifyKind(data_nascimento.Value, DateTimeKind.Utc)
+                DataNascimento = data_nascimento.Value.Date
             };
 
             try
@@ -44,7 +41,7 @@ namespace Projeto_Vandinha.Desktop.Screens
                 }
                 else if (resultado == 2)
                 {
-                    errorProvider1.SetError(cpf, "Dados do cliente inválidos.");
+                    errorProvider1.SetError(nome_completo, "Dados do cliente inválidos (verifique nome, idade 15-100 e e-mail).");
                     lblMensagemStatus.ForeColor = Color.Red;
                     lblMensagemStatus.Visible = true;
                     lblMensagemStatus.Text = "Dados do cliente inválidos.";
@@ -59,15 +56,6 @@ namespace Projeto_Vandinha.Desktop.Screens
                 else
                 {
                     MessageBox.Show("Cliente criado com sucesso!");
-                    lblMensagemStatus.ForeColor = Color.DarkGreen;
-                    lblMensagemStatus.Text = "Cliente cadastrado com sucesso!";
-                    lblMensagemStatus.Visible = true;
-
-                    cpf.Clear();
-                    nome_completo.Clear();
-                    e_mail.Clear();
-                    data_nascimento.Value = DateTime.Today;
-                    cpf.Focus();
                     this.Close();
                 }
             }
@@ -80,7 +68,7 @@ namespace Projeto_Vandinha.Desktop.Screens
             }
             finally
             {
-                criarBtn.Enabled = true; 
+                criarBtn.Enabled = true;
             }
         }
     }

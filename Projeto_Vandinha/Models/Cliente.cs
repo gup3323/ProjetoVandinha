@@ -1,44 +1,56 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Reflection.Metadata.Ecma335;
-using System.Text;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 
 namespace Projeto_Vandinha.Models
 {
     public class Cliente
     {
-        [Required, MinLength(11), MaxLength(11)]
-        public string Cpf { get; set; }
-        [Required]
-        [StringLength(80, MinimumLength = 6)]
-        [RegularExpression(@"^[\p{L}\s]+$")]
-        public string NomeCompleto { get; set; }
+        [Key]
+        [Required(ErrorMessage = "CPF é obrigatório.")]
+        [MinLength(11), MaxLength(11)]
+        public string Cpf { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Nome completo é obrigatório.")]
+        [StringLength(80, MinimumLength = 6, ErrorMessage = "O nome deve ter entre 6 e 80 caracteres.")]
+        [RegularExpression(@"^[\p{L}\s]+$", ErrorMessage = "O nome deve conter apenas letras e espaços.")]
+        public string NomeCompleto { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Data de nascimento é obrigatória.")]
         public DateTime DataNascimento { get; set; }
-        [Range(15, 100)]
+
+        [NotMapped]
         public int Idade
         {
             get
             {
                 var hoje = DateTime.Today;
                 var idade = hoje.Year - DataNascimento.Year;
-                var hojeDataNascimento = hoje.AddYears(-idade);
-                if (DataNascimento > hojeDataNascimento)
+                if (DataNascimento.Date > hoje.AddYears(-idade))
                 {
                     idade--;
                 }
                 return idade;
-
             }
         }
-        [Required, EmailAddress]
-        private string _email;
-        [StringLength(80, MinimumLength = 6)]
-        public string Email
+
+        private string? _email;
+
+        [EmailAddress(ErrorMessage = "E-mail inválido.")]
+        [StringLength(80, MinimumLength = 6, ErrorMessage = "O e-mail deve ter entre 6 e 80 caracteres.")]
+        public string? Email
         {
-            get { return this._email; }
-            set { this._email = value?.ToLower().Trim(); }
+            get => _email;
+            set => _email = string.IsNullOrWhiteSpace(value) ? null : value.ToLower().Trim();
         }
+
+        public List<Divida> Dividas { get; set; } = new();
+
+        [NotMapped]
+        public decimal TotalDividasEmAberto => Dividas
+            .Where(d => d.Situacao == "PENDENTE")
+            .Sum(d => d.Valor);
     }
 }

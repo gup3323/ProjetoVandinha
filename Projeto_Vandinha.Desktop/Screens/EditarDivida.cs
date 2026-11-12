@@ -1,50 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
-using System.Windows.Forms;
+﻿using Projeto_Vandinha.Models;
 using Projeto_Vandinha.Services;
-using Projeto_Vandinha.Models;
+using System;
+using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace Projeto_Vandinha.Desktop.Screens
 {
     public partial class EditarDivida : Form
     {
-        private string cpfOriginal;
+        private readonly int idDivida;
         private readonly DividaService service;
-        public EditarDivida(string cpfOriginal)
+
+        public EditarDivida(int idDivida)
         {
             InitializeComponent();
-            service = new DividaService();
-            this.cpfOriginal = cpfOriginal;
-            _ = CarregarDadosDoBancoAsync(this.cpfOriginal);
-        }
-
-        private async Task CarregarDadosDoBancoAsync(string cpf)
-        {
-            var divida = await service.BuscarDividaPorCpf(cpf);
-            if (divida != null)
-            {
-                situacaoEditar.Text = divida.Situacao == "PAGO".ToUpper() ? "PAGO".ToUpper() : "PENDENTE".ToUpper();
-                data_pagamento.Value = divida.DataPagamento;
-            }
-            else
-            {
-                MessageBox.Show("Dívida não encontrada no banco de dados.");
-                this.Close();
-            }
+            this.service = new DividaService();
+            this.idDivida = idDivida;
         }
 
         private async void EditarDivida_Load(object sender, EventArgs e)
         {
-            var service = new DividaService();
-            var divida = await service.BuscarDividaPorCpf(cpfOriginal);
+            var divida = await service.BuscarDividaPorId(idDivida);
             if (divida != null)
             {
-                situacaoEditar.Text = divida.Situacao == "PAGO".ToUpper() ? "PAGO".ToUpper() : "PENDENTE".ToUpper();
-                data_pagamento.Value=  divida.DataPagamento;
+                situacaoEditar.Text = divida.Situacao == "PAGO" ? "PAGO" : "PENDENTE";
+                data_pagamento.Value = divida.DataPagamento ?? DateTime.Today;
             }
             else
             {
@@ -53,24 +33,18 @@ namespace Projeto_Vandinha.Desktop.Screens
             }
         }
 
-        private void data_pagamento_ValueChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label1_Click(object sender, EventArgs e)
-        {
-
-        }
+        private void data_pagamento_ValueChanged(object sender, EventArgs e) { }
+        private void label1_Click(object sender, EventArgs e) { }
 
         private async void criarBtn_Click(object sender, EventArgs e)
         {
             var dividaAtualizada = new Divida
             {
                 Situacao = situacaoEditar.Text.Trim().ToUpperInvariant(),
-                DataPagamento = data_pagamento.Value.Date.ToUniversalTime()
+                DataPagamento = data_pagamento.Value.Date
             };
-            bool sucesso = await service.AtualizarSituacaoDivida(cpfOriginal, dividaAtualizada);
+
+            bool sucesso = await service.AtualizarSituacaoDivida(idDivida, dividaAtualizada);
             if (sucesso)
             {
                 MessageBox.Show("Dívida atualizada com sucesso.");

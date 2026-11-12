@@ -1,13 +1,9 @@
-﻿using Projeto_Vandinha.Services;
+﻿using Projeto_Vandinha.Models;
+using Projeto_Vandinha.Services;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Forms;
-using Microsoft.EntityFrameworkCore;
-using Projeto_Vandinha.Models;
 
 namespace Projeto_Vandinha.Desktop.Screens
 {
@@ -22,14 +18,15 @@ namespace Projeto_Vandinha.Desktop.Screens
             Load += ExibirDivida_Load;
         }
 
-        private async void ExibirDivida_Load(object sender, EventArgs e)
+        private async void ExibirDivida_Load(object? sender, EventArgs e)
         {
+            pgAtual.Text = "1";
             await CarregarDados();
         }
 
         private async Task CarregarDados()
         {
-            int paginaAtual = 1;
+            int paginaAtual = int.TryParse(pgAtual.Text, out int pg) && pg > 0 ? pg : 1;
             var dividas = await dividaService.ListarDivida(paginaAtual);
             CarregarTabela(dividas);
         }
@@ -42,58 +39,70 @@ namespace Projeto_Vandinha.Desktop.Screens
                 dataGridView1.Rows.Add(
                     divida.id_divida,
                     divida.CpfCliente,
-                    divida.Situacao == "PAGO".ToUpper() ? "Pago".ToUpper() : "Pendente".ToUpper(),
-                    divida.DataPagamento.ToString("dd/MM/yyyy") ?? "N/A",
-                    divida.Valor,
+                    divida.Situacao == "PAGO" ? "PAGO" : "PENDENTE",
+                    divida.DataPagamento.HasValue ? divida.DataPagamento.Value.ToString("dd/MM/yyyy") : "N/A",
+                    divida.Valor.ToString("C2"),
                     divida.DataCriacao.ToString("dd/MM/yyyy")
                 );
             }
         }
+
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
-
+            if (e.RowIndex >= 0 && dataGridView1.Rows[e.RowIndex].Cells[1].Value != null)
+            {
+                txtBusca.Text = dataGridView1.Rows[e.RowIndex].Cells[1].Value.ToString();
+            }
         }
 
         private async void botaoBuscar2_Click(object sender, EventArgs e)
         {
-            var divida = await dividaService.BuscarDividaPorCpf(txtBusca.Text);
-            if (txtBusca.Text == "")
-            {
-                CarregarDados();
-            }
-            else
-            {
-                var resultados = await dividaService.BuscarDividas(txtBusca.Text);
-                CarregarTabela(resultados);
-            }
+            await ExecutarBusca();
         }
 
         private async void botaoBuscar1_Click(object sender, EventArgs e)
         {
+            await ExecutarBusca();
+        }
+
+        private async Task ExecutarBusca()
+        {
             if (string.IsNullOrWhiteSpace(txtBusca.Text))
             {
-                CarregarDados();
+                pgAtual.Text = "1";
+                await CarregarDados();
             }
             else
             {
                 var resultados = await dividaService.BuscarDividas(txtBusca.Text);
-
                 CarregarTabela(resultados);
             }
         }
 
         private async void botaoEditar1_Click(object sender, EventArgs e)
         {
-            var dividaSelecionada = await dividaService.BuscarDividaPorCpf(txtBusca.Text);
-            if (dividaSelecionada != null)
+            int? idDividaSelecionada = null;
+
+            if (dataGridView1.CurrentRow != null && dataGridView1.CurrentRow.Cells[0].Value != null)
             {
-                var editarDividaForm = new EditarDivida(dividaSelecionada.CpfCliente);
-                editarDividaForm.ShowDialog();
-                CarregarDados();
+                idDividaSelecionada = Convert.ToInt32(dataGridView1.CurrentRow.Cells[0].Value);
+            }
+            else if (!string.IsNullOrWhiteSpace(txtBusca.Text))
+            {
+                var divida = await dividaService.BuscarDividaPorCpf(txtBusca.Text);
+                if (divida != null)
+                    idDividaSelecionada = divida.id_divida;
+            }
+
+            if (idDividaSelecionada.HasValue)
+            {
+                var editarDividaForm = new EditarDivida(idDividaSelecionada.Value);
+                editarDividaForm.ShowDialog(this);
+                await ExecutarBusca();
             }
             else
             {
-                MessageBox.Show("Pesquise um cliente para editar.");
+                MessageBox.Show("Selecione uma dívida na tabela ou pesquise um cliente para marcar pagamento.");
             }
         }
 
@@ -117,27 +126,11 @@ namespace Projeto_Vandinha.Desktop.Screens
             int paginaAtual = int.Parse(pgAtual.Text);
             if (paginaAtual > 1)
             {
-                ant.Visible = true;
                 paginaAtual--;
                 var dividas = await dividaService.ListarDivida(paginaAtual);
                 CarregarTabela(dividas);
                 pgAtual.Text = paginaAtual.ToString();
             }
         }
-
-        //private async void prx_Click(object sender, EventArgs e)
-        //{
-        //    int paginaAtual = int.Parse(pgAtual.Text);
-        //    paginaAtual++;
-        //    var clientes = await service.ListarClientes(paginaAtual);
-
-        //    if (clientes.Count > 0)
-        //    {
-        //        ant.Visible = true;
-        //        CarregarTabela(clientes);
-        //        pgAtual.Text = paginaAtual.ToString();
-        //    }
     }
 }
-
-

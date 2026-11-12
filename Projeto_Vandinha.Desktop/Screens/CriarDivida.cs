@@ -1,70 +1,52 @@
 ﻿using Projeto_Vandinha.Services;
-using Projeto_Vandinha.Models;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 
 namespace Projeto_Vandinha.Desktop.Screens
 {
     public partial class CriarDivida : Form
     {
-
-        private void label3_Click(object sender, EventArgs e)
-        {
-        }
-
-        private void label2_Click(object sender, EventArgs e)
-        {
-        }
-
-        private void cpf_TextChanged(object sender, EventArgs e)
-        {
-        }
-        private void tableLayoutPanel1_Paint(object sender, PaintEventArgs e)
-        {
-        }
-        private void lblMensagemStatus_Click(object sender, EventArgs e)
-        {
-        }
-
-
         private readonly DividaService service;
+
         public CriarDivida(DividaService service)
         {
             this.service = service;
             InitializeComponent();
         }
 
+        private void label3_Click(object sender, EventArgs e) { }
+        private void label2_Click(object sender, EventArgs e) { }
+        private void cpf_TextChanged(object sender, EventArgs e) { }
+        private void tableLayoutPanel1_Paint(object sender, PaintEventArgs e) { }
+        private void lblMensagemStatus_Click(object sender, EventArgs e) { }
+        private void numericUpDown1_ValueChanged(object sender, EventArgs e) { }
+
         private async void criarBtn_Click(object sender, EventArgs e)
         {
             criarBtn.Enabled = false;
-            var divida = new Divida
-            {
-                //id_divida = 0,
-                CpfCliente = cpf.Text,
-                Valor = (decimal)numericUpDown1.Value,
-                Situacao = "pendente".ToUpper(),
-                DataCriacao = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Utc),
-                DataPagamento = DateTime.SpecifyKind(data_pagamento.Value, DateTimeKind.Utc)
-            };
+
             try
             {
-                int resultado = service.CriarDivida(divida.CpfCliente, divida.Valor, divida.DataPagamento);
+                int resultado = await service.CriarDivida(cpf.Text, numericUpDown1.Value, null);
+
                 if (resultado == 1)
                 {
                     lblMensagemStatus.ForeColor = Color.Red;
                     lblMensagemStatus.Visible = true;
-                    lblMensagemStatus.Text = "CPF inválido.";
+                    lblMensagemStatus.Text = "CPF inválido ou cliente não cadastrado.";
                 }
-                if (resultado == 2)
+                else if (resultado == 2)
                 {
                     lblMensagemStatus.ForeColor = Color.Red;
                     lblMensagemStatus.Visible = true;
                     lblMensagemStatus.Text = "Cliente já possui uma dívida em aberto.";
+                }
+                else if (resultado == 3)
+                {
+                    lblMensagemStatus.ForeColor = Color.Red;
+                    lblMensagemStatus.Visible = true;
+                    lblMensagemStatus.Text = "O valor da dívida deve ser maior que zero.";
                 }
                 else
                 {
@@ -75,7 +57,6 @@ namespace Projeto_Vandinha.Desktop.Screens
                     cpf.Clear();
                     numericUpDown1.Value = 0;
                     data_pagamento.Value = DateTime.Today;
-
                 }
             }
             catch (Exception ex)
@@ -89,12 +70,6 @@ namespace Projeto_Vandinha.Desktop.Screens
             {
                 criarBtn.Enabled = true;
             }
-
-        }
-
-        private void numericUpDown1_ValueChanged(object sender, EventArgs e)
-        {
-
         }
 
         private void CriarDivida_Load(object sender, EventArgs e)
