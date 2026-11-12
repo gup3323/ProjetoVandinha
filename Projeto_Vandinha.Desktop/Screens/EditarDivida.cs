@@ -14,16 +14,18 @@ namespace Projeto_Vandinha.Desktop.Screens
         public EditarDivida(int idDivida)
         {
             InitializeComponent();
-            this.service = new DividaService();
+            service = new DividaService();
             this.idDivida = idDivida;
+            _ = CarregarDadosDoBancoAsync(this.idDivida);
         }
 
-        private async void EditarDivida_Load(object sender, EventArgs e)
+        private async Task CarregarDadosDoBancoAsync(int id)
         {
-            var divida = await service.BuscarDividaPorId(idDivida);
+            var divida = await service.BuscarDividaPorId(id);
+
             if (divida != null)
             {
-                situacaoEditar.Text = divida.Situacao == "PAGO" ? "PAGO" : "PENDENTE";
+                situacaoEditar.Text = "PAGO";
                 data_pagamento.Value = divida.DataPagamento ?? DateTime.Today;
             }
             else
@@ -40,19 +42,20 @@ namespace Projeto_Vandinha.Desktop.Screens
         {
             var dividaAtualizada = new Divida
             {
-                Situacao = situacaoEditar.Text.Trim().ToUpperInvariant(),
+                Situacao = "PAGO",
                 DataPagamento = data_pagamento.Value.Date
             };
 
             bool sucesso = await service.AtualizarSituacaoDivida(idDivida, dividaAtualizada);
+
             if (sucesso)
             {
-                MessageBox.Show("Dívida atualizada com sucesso.");
+                MessageBox.Show("Pagamento registrado com sucesso!");
                 this.Close();
             }
             else
             {
-                MessageBox.Show("Erro ao atualizar a dívida.");
+                MessageBox.Show("Falha ao atualizar a dívida.");
             }
         }
     }
